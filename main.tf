@@ -2,12 +2,6 @@ resource "null_resource" "dependencies" {
   triggers = var.dependency_ids
 }
 
-resource "kubernetes_namespace_v1" "keycloak_namespace" {
-  metadata {
-    name = var.namespace
-  }
-}
-
 resource "kubernetes_secret_v1" "keycloak_db_secret" {
   metadata {
     name      = "keycloak-db-secret"
@@ -20,7 +14,7 @@ resource "kubernetes_secret_v1" "keycloak_db_secret" {
   }
 
   depends_on = [
-    kubernetes_namespace_v1.keycloak_namespace
+    resource.null_resource.dependencies
   ]
 }
 
