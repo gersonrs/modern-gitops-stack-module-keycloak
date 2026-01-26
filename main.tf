@@ -2,6 +2,22 @@ resource "null_resource" "dependencies" {
   triggers = var.dependency_ids
 }
 
+resource "kubernetes_secret_v1" "keycloak_db_secret" {
+  metadata {
+    name      = "keycloak-db-secret"
+    namespace = var.namespace
+  }
+
+  data = {
+    username = var.database != null ? var.database.username : "postgres"
+    password = var.database != null ? var.database.password : random_password.db_password.0.result
+  }
+
+  depends_on = [
+    resource.null_resource.dependencies
+  ]
+}
+
 resource "random_password" "db_password" {
   count   = var.database == null ? 1 : 0
   length  = 32
@@ -13,18 +29,16 @@ resource "argocd_project" "this" {
 
   metadata {
     name      = var.destination_cluster != "in-cluster" ? "keycloak-${var.destination_cluster}" : "keycloak"
-    namespace = "argocd"
+    namespace = var.argocd_namespace
   }
 
   spec {
-    description = "Keycloak application project for cluster ${var.destination_cluster}"
-    source_repos = [
-      "https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git",
-    ]
+    description  = "Keycloak application project for cluster ${var.destination_cluster}"
+    source_repos = [var.project_source_repo]
 
     destination {
       name      = var.destination_cluster
-      namespace = "keycloak"
+      namespace = var.namespace
     }
 
     orphaned_resources {
@@ -45,7 +59,7 @@ data "utils_deep_merge_yaml" "values" {
 resource "argocd_application" "operator" {
   metadata {
     name      = var.destination_cluster != "in-cluster" ? "keycloak-operator-${var.destination_cluster}" : "keycloak-operator"
-    namespace = "argocd"
+    namespace = var.argocd_namespace
     labels = merge({
       "application" = "keycloak-operator"
       "cluster"     = var.destination_cluster
@@ -68,7 +82,7 @@ resource "argocd_application" "operator" {
 
     destination {
       name      = var.destination_cluster
-      namespace = "keycloak"
+      namespace = var.namespace
     }
 
     sync_policy {
@@ -104,7 +118,7 @@ resource "argocd_application" "operator" {
 resource "argocd_application" "this" {
   metadata {
     name      = var.destination_cluster != "in-cluster" ? "keycloak-${var.destination_cluster}" : "keycloak"
-    namespace = "argocd"
+    namespace = var.argocd_namespace
     labels = merge({
       "application" = "keycloak"
       "cluster"     = var.destination_cluster
@@ -122,7 +136,7 @@ resource "argocd_application" "this" {
     project = var.argocd_project == null ? argocd_project.this[0].metadata.0.name : var.argocd_project
 
     source {
-      repo_url        = "https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git"
+      repo_url        = var.project_source_repo
       path            = "charts/keycloak"
       target_revision = var.target_revision
       helm {
@@ -133,7 +147,7 @@ resource "argocd_application" "this" {
 
     destination {
       name      = var.destination_cluster
-      namespace = "keycloak"
+      namespace = var.namespace
     }
 
     sync_policy {
@@ -162,6 +176,7 @@ resource "argocd_application" "this" {
 
   depends_on = [
     resource.argocd_application.operator,
+    resource.kubernetes_secret_v1.keycloak_db_secret,
   ]
 }
 
@@ -169,7 +184,7 @@ resource "argocd_application" "this" {
 resource "null_resource" "wait_for_keycloak" {
   provisioner "local-exec" {
     command = <<EOT
-    while [ $(curl -k https://keycloak.${trimprefix("${var.subdomain}.${var.cluster_name}", ".")}.${var.base_domain} -I -s | head -n 1 | cut -d' ' -f2) != '200' ]; do
+    while [ $(curl -k https://keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain} -I -s | head -n 1 | cut -d' ' -f2) != '302' ]; do
       sleep 5
     done
     EOT
@@ -180,10 +195,10 @@ resource "null_resource" "wait_for_keycloak" {
   ]
 }
 
-data "kubernetes_secret" "admin_credentials" {
+data "kubernetes_secret_v1" "admin_credentials" {
   metadata {
     name      = "keycloak-initial-admin"
-    namespace = "keycloak"
+    namespace = var.namespace
   }
   depends_on = [
     resource.null_resource.wait_for_keycloak,

@@ -2,6 +2,25 @@
 ## Standard variables
 #######################
 
+
+variable "project_source_repo" {
+  description = "Repository allowed to be scraped in this AppProject."
+  type        = string
+  default     = "https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git"
+}
+
+variable "namespace" {
+  description = "Namespace where the applications's Kubernetes resources should be created. Namespace will be created in case it doesn't exist."
+  type        = string
+  default     = "management"
+}
+
+variable "argocd_namespace" {
+  description = "Namespace used by Argo CD where the Application and AppProject resources should be created."
+  type        = string
+  default     = "argocd"
+}
+
 variable "cluster_name" {
   description = "Name given to the cluster. Value used for the ingress' URL of the application."
   type        = string
@@ -49,10 +68,22 @@ variable "cluster_issuer" {
   default     = "selfsigned-issuer"
 }
 
+variable "enable_service_monitor" {
+  description = "Enable Prometheus ServiceMonitor in the Helm chart."
+  type        = bool
+  default     = false
+}
+
 variable "helm_values" {
   description = "Helm chart value overrides. They should be passed as a list of HCL structures."
   type        = any
   default     = []
+}
+
+variable "replicas" {
+  description = "Number of keycloak pods to be deployed."
+  type        = number
+  default     = 1
 }
 
 variable "app_autosync" {
@@ -82,10 +113,10 @@ variable "dependency_ids" {
 variable "database" {
   description = "Keycloak external database server configuration."
   type = object({
-    vendor   = string
     host     = string
     username = string
     password = string
   })
-  default = null
+  default   = null
+  sensitive = true
 }
