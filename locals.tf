@@ -25,11 +25,11 @@ locals {
           "traefik.ingress.kubernetes.io/router.entrypoints" = "websecure"
           "traefik.ingress.kubernetes.io/router.tls"         = "true"
         }
-        host = "keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain}"
+        host = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
         path = "/"
         tls = {
           secretName = "keycloak-tls-secret"
-          host       = "keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain}"
+          host       = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
         }
       }
     }
