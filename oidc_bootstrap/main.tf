@@ -110,6 +110,54 @@ resource "keycloak_group" "modern_gitops_stack_admins" {
   }
 }
 
+resource "keycloak_group" "modern_gitops_stack_viewers" {
+  realm_id = resource.keycloak_realm.modern_gitops_stack.id
+  name     = "modern-gitops-stack-viewers"
+  attributes = {
+    "terraform" = "true"
+    "policy"    = "readonly"
+  }
+}
+
+resource "keycloak_group" "modern_gitops_stack_editors" {
+  realm_id = resource.keycloak_realm.modern_gitops_stack.id
+  name     = "modern-gitops-stack-editors"
+  attributes = {
+    "terraform" = "true"
+    "policy"    = "readwrite"
+  }
+}
+
+resource "keycloak_group" "modern_gitops_stack_data_engineers" {
+  realm_id = resource.keycloak_realm.modern_gitops_stack.id
+  name     = "modern-gitops-stack-data-engineers"
+  attributes = {
+    "terraform"   = "true"
+    "policy"      = "readwrite"
+    "description" = "Data Engineers - Access to data pipelines, ETL jobs, Airflow, NiFi, Kafka"
+  }
+}
+
+resource "keycloak_group" "modern_gitops_stack_data_scientists" {
+  realm_id = resource.keycloak_realm.modern_gitops_stack.id
+  name     = "modern-gitops-stack-data-scientists"
+  attributes = {
+    "terraform"   = "true"
+    "policy"      = "readwrite"
+    "description" = "Data Scientists - Access to JupyterHub, MLflow experiments, notebooks"
+  }
+}
+
+resource "keycloak_group" "modern_gitops_stack_ml_engineers" {
+  realm_id = resource.keycloak_realm.modern_gitops_stack.id
+  name     = "modern-gitops-stack-ml-engineers"
+  attributes = {
+    "terraform"   = "true"
+    "policy"      = "readwrite##diagnostics"
+    "description" = "ML Engineers - Access to MLflow models, model registry, deployments, monitoring"
+  }
+}
+
 resource "random_password" "modern_gitops_stack_users" {
   for_each = var.user_map
 
@@ -145,6 +193,11 @@ resource "null_resource" "this" {
   depends_on = [
     resource.keycloak_realm.modern_gitops_stack,
     resource.keycloak_group.modern_gitops_stack_admins,
+    resource.keycloak_group.modern_gitops_stack_viewers,
+    resource.keycloak_group.modern_gitops_stack_editors,
+    resource.keycloak_group.modern_gitops_stack_data_engineers,
+    resource.keycloak_group.modern_gitops_stack_data_scientists,
+    resource.keycloak_group.modern_gitops_stack_ml_engineers,
     resource.keycloak_user.modern_gitops_stack_users,
     resource.keycloak_user_groups.modern_gitops_stack_admins,
     resource.keycloak_openid_client_default_scopes.client_default_scopes
