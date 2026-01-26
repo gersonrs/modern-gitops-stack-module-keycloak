@@ -99,6 +99,8 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
+- [[provider_kubernetes]] <<provider_kubernetes,kubernetes>> (>= 2)
+
 - [[provider_random]] <<provider_random,random>> (>= 3)
 
 - [[provider_argocd]] <<provider_argocd,argocd>> (>= 6)
@@ -107,8 +109,6 @@ The following providers are used by this module:
 
 - [[provider_null]] <<provider_null,null>> (>= 3)
 
-- [[provider_kubernetes]] <<provider_kubernetes,kubernetes>> (>= 2)
-
 === Resources
 
 The following resources are used by this module:
@@ -116,11 +116,12 @@ The following resources are used by this module:
 - https://registry.terraform.io/providers/argoproj-labs/argocd/latest/docs/resources/application[argocd_application.operator] (resource)
 - https://registry.terraform.io/providers/argoproj-labs/argocd/latest/docs/resources/application[argocd_application.this] (resource)
 - https://registry.terraform.io/providers/argoproj-labs/argocd/latest/docs/resources/project[argocd_project.this] (resource)
+- https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1[kubernetes_secret_v1.keycloak_db_secret] (resource)
 - https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource[null_resource.dependencies] (resource)
 - https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource[null_resource.this] (resource)
 - https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource[null_resource.wait_for_keycloak] (resource)
 - https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password[random_password.db_password] (resource)
-- https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret[kubernetes_secret.admin_credentials] (data source)
+- https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret_v1[kubernetes_secret_v1.admin_credentials] (data source)
 - https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml[utils_deep_merge_yaml.values] (data source)
 
 === Required Inputs
@@ -142,6 +143,30 @@ Type: `string`
 === Optional Inputs
 
 The following input variables are optional (have default values):
+
+==== [[input_project_source_repo]] <<input_project_source_repo,project_source_repo>>
+
+Description: Repository allowed to be scraped in this AppProject.
+
+Type: `string`
+
+Default: `"https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git"`
+
+==== [[input_namespace]] <<input_namespace,namespace>>
+
+Description: Namespace where the applications's Kubernetes resources should be created. Namespace will be created in case it doesn't exist.
+
+Type: `string`
+
+Default: `"management"`
+
+==== [[input_argocd_namespace]] <<input_argocd_namespace,argocd_namespace>>
+
+Description: Namespace used by Argo CD where the Application and AppProject resources should be created.
+
+Type: `string`
+
+Default: `"argocd"`
 
 ==== [[input_subdomain]] <<input_subdomain,subdomain>>
 
@@ -181,7 +206,7 @@ Description: Override of target revision of the application chart.
 
 Type: `string`
 
-Default: `"v2.5.1"`
+Default: `"v2.6.0"`
 
 ==== [[input_cluster_issuer]] <<input_cluster_issuer,cluster_issuer>>
 
@@ -191,6 +216,14 @@ Type: `string`
 
 Default: `"selfsigned-issuer"`
 
+==== [[input_enable_service_monitor]] <<input_enable_service_monitor,enable_service_monitor>>
+
+Description: Enable Prometheus ServiceMonitor in the Helm chart.
+
+Type: `bool`
+
+Default: `false`
+
 ==== [[input_helm_values]] <<input_helm_values,helm_values>>
 
 Description: Helm chart value overrides. They should be passed as a list of HCL structures.
@@ -198,6 +231,14 @@ Description: Helm chart value overrides. They should be passed as a list of HCL 
 Type: `any`
 
 Default: `[]`
+
+==== [[input_replicas]] <<input_replicas,replicas>>
+
+Description: Number of keycloak pods to be deployed.
+
+Type: `number`
+
+Default: `1`
 
 ==== [[input_app_autosync]] <<input_app_autosync,app_autosync>>
 
@@ -239,7 +280,6 @@ Type:
 [source,hcl]
 ----
 object({
-    vendor   = string
     host     = string
     username = string
     password = string
@@ -284,11 +324,11 @@ Description: Credentials for the administrator user of the master realm created 
 [cols="a,a",options="header,autowidth"]
 |===
 |Name |Version
+|[[provider_kubernetes]] <<provider_kubernetes,kubernetes>> |>= 2
 |[[provider_random]] <<provider_random,random>> |>= 3
 |[[provider_utils]] <<provider_utils,utils>> |>= 1
 |[[provider_argocd]] <<provider_argocd,argocd>> |>= 6
 |[[provider_null]] <<provider_null,null>> |>= 3
-|[[provider_kubernetes]] <<provider_kubernetes,kubernetes>> |>= 2
 |===
 
 = Resources
@@ -299,11 +339,12 @@ Description: Credentials for the administrator user of the master realm created 
 |https://registry.terraform.io/providers/argoproj-labs/argocd/latest/docs/resources/application[argocd_application.operator] |resource
 |https://registry.terraform.io/providers/argoproj-labs/argocd/latest/docs/resources/application[argocd_application.this] |resource
 |https://registry.terraform.io/providers/argoproj-labs/argocd/latest/docs/resources/project[argocd_project.this] |resource
+|https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1[kubernetes_secret_v1.keycloak_db_secret] |resource
 |https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource[null_resource.dependencies] |resource
 |https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource[null_resource.this] |resource
 |https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource[null_resource.wait_for_keycloak] |resource
 |https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password[random_password.db_password] |resource
-|https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret[kubernetes_secret.admin_credentials] |data source
+|https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret_v1[kubernetes_secret_v1.admin_credentials] |data source
 |https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml[utils_deep_merge_yaml.values] |data source
 |===
 
@@ -312,6 +353,24 @@ Description: Credentials for the administrator user of the master realm created 
 [cols="a,a,a,a,a",options="header,autowidth"]
 |===
 |Name |Description |Type |Default |Required
+|[[input_project_source_repo]] <<input_project_source_repo,project_source_repo>>
+|Repository allowed to be scraped in this AppProject.
+|`string`
+|`"https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git"`
+|no
+
+|[[input_namespace]] <<input_namespace,namespace>>
+|Namespace where the applications's Kubernetes resources should be created. Namespace will be created in case it doesn't exist.
+|`string`
+|`"management"`
+|no
+
+|[[input_argocd_namespace]] <<input_argocd_namespace,argocd_namespace>>
+|Namespace used by Argo CD where the Application and AppProject resources should be created.
+|`string`
+|`"argocd"`
+|no
+
 |[[input_cluster_name]] <<input_cluster_name,cluster_name>>
 |Name given to the cluster. Value used for the ingress' URL of the application.
 |`string`
@@ -351,7 +410,7 @@ Description: Credentials for the administrator user of the master realm created 
 |[[input_target_revision]] <<input_target_revision,target_revision>>
 |Override of target revision of the application chart.
 |`string`
-|`"v2.5.1"`
+|`"v2.6.0"`
 |no
 
 |[[input_cluster_issuer]] <<input_cluster_issuer,cluster_issuer>>
@@ -360,10 +419,22 @@ Description: Credentials for the administrator user of the master realm created 
 |`"selfsigned-issuer"`
 |no
 
+|[[input_enable_service_monitor]] <<input_enable_service_monitor,enable_service_monitor>>
+|Enable Prometheus ServiceMonitor in the Helm chart.
+|`bool`
+|`false`
+|no
+
 |[[input_helm_values]] <<input_helm_values,helm_values>>
 |Helm chart value overrides. They should be passed as a list of HCL structures.
 |`any`
 |`[]`
+|no
+
+|[[input_replicas]] <<input_replicas,replicas>>
+|Number of keycloak pods to be deployed.
+|`number`
+|`1`
 |no
 
 |[[input_app_autosync]] <<input_app_autosync,app_autosync>>
@@ -405,7 +476,6 @@ object({
 [source]
 ----
 object({
-    vendor   = string
     host     = string
     username = string
     password = string
