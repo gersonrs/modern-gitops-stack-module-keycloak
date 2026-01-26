@@ -2,6 +2,28 @@ resource "null_resource" "dependencies" {
   triggers = var.dependency_ids
 }
 
+resource "kubernetes_namespace_v1" "keycloak_namespace" {
+  metadata {
+    name = var.namespace
+  }
+}
+
+resource "kubernetes_secret_v1" "keycloak_db_secret" {
+  metadata {
+    name      = "keycloak-db-secret"
+    namespace = var.namespace
+  }
+
+  data = {
+    username = var.database != null ? var.database.username : "postgres"
+    password = var.database != null ? var.database.password : random_password.db_password.0.result
+  }
+
+  depends_on = [
+    kubernetes_namespace_v1.keycloak_namespace
+  ]
+}
+
 resource "random_password" "db_password" {
   count   = var.database == null ? 1 : 0
   length  = 32
@@ -160,6 +182,7 @@ resource "argocd_application" "this" {
 
   depends_on = [
     resource.argocd_application.operator,
+    resource.kubernetes_secret_v1.keycloak_db_secret,
   ]
 }
 
