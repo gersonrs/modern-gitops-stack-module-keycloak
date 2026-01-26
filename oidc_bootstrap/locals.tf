@@ -1,6 +1,4 @@
 locals {
-  gitlab_domain = format("gitlab.%s", trimprefix("${var.subdomain}.${var.base_domain}", "."))
-
   oidc = {
     issuer_url    = format("https://keycloak.%s/realms/modern-gitops-stack", trimprefix("${var.subdomain}.${var.base_domain}", "."))
     oauth_url     = format("https://keycloak.%s/realms/modern-gitops-stack/protocol/openid-connect/auth", trimprefix("${var.subdomain}.${var.base_domain}", "."))
@@ -12,6 +10,5 @@ locals {
       "--insecure-oidc-skip-issuer-verification=true",
       "--ssl-insecure-skip-verify=true",
     ] : []
-    fingerprint = split("=", data.external.fingerprint_generator.result.fingerprint)[1]
   }
 }
