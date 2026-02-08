@@ -16,6 +16,18 @@ locals {
       serviceMonitor = {
         enabled = var.enable_service_monitor
       }
+      theme = {
+        enabled = var.enable_custom_theme
+        name    = var.theme_config.name
+        initContainer = {
+          image = var.theme_config.init_container_image
+        }
+        repository = {
+          url    = var.theme_config.repository_url
+          branch = var.theme_config.repository_branch
+          path   = var.theme_config.repository_path
+        }
+      }
       ingress = {
         enabled = true
         annotations = {
