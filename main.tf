@@ -14,6 +14,7 @@ resource "kubernetes_secret_v1" "keycloak_db_secret" {
   }
 
   depends_on = [
+    resource.argocd_application.operator,
     resource.null_resource.dependencies
   ]
 }
