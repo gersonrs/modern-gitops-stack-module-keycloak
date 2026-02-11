@@ -7,6 +7,7 @@ resource "keycloak_realm" "modern_gitops_stack" {
   display_name                = "Modern GitOps Stack"
   display_name_html           = "<img width='200px' src='https://raw.githubusercontent.com/GersonRS/credit-risk-analysis-with-machine-learning/main/.github/assets/images/logo.png' alt='Modern GitOps Stack Logo'/>"
   login_with_email_allowed    = true
+  login_theme                 = "modern-gitops"
   default_signature_algorithm = "RS256"
   access_code_lifespan        = "1h"
   ssl_required                = "external"
