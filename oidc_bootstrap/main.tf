@@ -125,7 +125,7 @@ resource "keycloak_group" "modern_gitops_stack_editors" {
   name     = "modern-gitops-stack-editors"
   attributes = {
     "terraform" = "true"
-    "policy"    = "readwrite"
+    "policy"    = "consoleAdmin##readwrite"
   }
 }
 
@@ -134,7 +134,7 @@ resource "keycloak_group" "modern_gitops_stack_data_engineers" {
   name     = "modern-gitops-stack-data-engineers"
   attributes = {
     "terraform"   = "true"
-    "policy"      = "readwrite"
+    "policy"      = "consoleAdmin##readwrite"
     "description" = "Data Engineers - Access to data pipelines, ETL jobs, Airflow, NiFi, Kafka"
   }
 }
