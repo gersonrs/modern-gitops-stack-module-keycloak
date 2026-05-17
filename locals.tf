@@ -28,19 +28,11 @@ locals {
           path   = var.theme_config.repository_path
         }
       }
-      ingress = {
-        enabled = true
-        annotations = {
-          "cert-manager.io/cluster-issuer"                   = "${var.cluster_issuer}"
-          "traefik.ingress.kubernetes.io/router.entrypoints" = "websecure"
-          "traefik.ingress.kubernetes.io/router.tls"         = "true"
-        }
-        host = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
-        path = "/"
-        tls = {
-          secretName = "keycloak-tls-secret"
-          host       = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
-        }
+      httproute = {
+        enabled           = true
+        host              = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
+        gateway_name      = "istio-gateway"
+        gateway_namespace = "istio-ingress"
       }
     }
   }]

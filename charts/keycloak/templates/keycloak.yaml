@@ -18,10 +18,8 @@ spec:
       key: password
   http:
     httpEnabled: true
-    httpsPort: 8443
-    tlsSecret: keycloak-tls-secret
   hostname:
-    hostname: {{ .Values.keycloak.ingress.host | quote }}
+    hostname: {{ .Values.keycloak.httproute.host | quote }}
   ingress:
     enabled: false
   proxy:
