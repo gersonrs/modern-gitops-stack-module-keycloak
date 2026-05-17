@@ -185,9 +185,12 @@ resource "argocd_application" "this" {
 resource "null_resource" "wait_for_keycloak" {
   provisioner "local-exec" {
     command = <<EOT
-    while [ $(curl -k https://keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain} -I -s | head -n 1 | cut -d' ' -f2) != '302' ]; do
-      sleep 5
+    echo "Aguardando Keycloak ficar disponível..."
+    until [ "$(curl -k -s -o /dev/null -w '%{http_code}' https://keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain}/realms/master)" = "200" ]; do
+      echo "Keycloak ainda não está pronto. Aguardando 10s..."
+      sleep 10
     done
+    echo "Keycloak disponível."
     EOT
   }
 
