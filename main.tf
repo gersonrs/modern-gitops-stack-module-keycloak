@@ -186,7 +186,7 @@ resource "null_resource" "wait_for_keycloak" {
   provisioner "local-exec" {
     command = <<EOT
     echo "Aguardando Keycloak ficar disponível..."
-    until [ "$(curl -k -s -o /dev/null -w '%{http_code}' https://keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain}/realms/master)" = "200" ]; do
+    until [ "$(curl -k -s -o /dev/null -w '%%{http_code}' https://keycloak.${trimprefix("${var.subdomain}", ".")}.${var.base_domain}/realms/master)" = "200" ]; do
       echo "Keycloak ainda não está pronto. Aguardando 10s..."
       sleep 10
     done
