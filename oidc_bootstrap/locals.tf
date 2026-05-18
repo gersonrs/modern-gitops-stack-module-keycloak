@@ -1,5 +1,5 @@
 locals {
-  url_scheme = var.cluster_issuer == "letsencrypt-prod" ? "https" : "http"
+  url_scheme = var.cluster_issuer == "selfsigned-issuer" ? "http" : "https"
   oidc = {
     issuer_url    = format("%s://keycloak.%s/realms/modern-gitops-stack", local.url_scheme, trimprefix("${var.subdomain}.${var.base_domain}", "."))
     oauth_url     = format("%s://keycloak.%s/realms/modern-gitops-stack/protocol/openid-connect/auth", local.url_scheme, trimprefix("${var.subdomain}.${var.base_domain}", "."))
