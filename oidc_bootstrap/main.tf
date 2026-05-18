@@ -37,6 +37,14 @@ resource "keycloak_openid_client" "modern_gitops_stack" {
   valid_redirect_uris          = var.oidc_redirect_uris
 }
 
+resource "keycloak_openid_audience_protocol_mapper" "modern_gitops_stack" {
+  realm_id  = resource.keycloak_realm.modern_gitops_stack.id
+  client_id = resource.keycloak_openid_client.modern_gitops_stack.id
+  name      = "audience"
+
+  included_client_audience = local.oidc.client_id
+}
+
 resource "keycloak_openid_client_scope" "modern_gitops_stack_groups" {
   realm_id               = resource.keycloak_realm.modern_gitops_stack.id
   name                   = "groups"
