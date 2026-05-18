@@ -31,8 +31,8 @@ locals {
       httproute = {
         enabled           = true
         host              = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
-        gateway_name      = "istio-gateway"
-        gateway_namespace = "istio-ingress"
+        gateway_name      = var.gateway_name
+        gateway_namespace = var.gateway_namespace
       }
     }
   }]
