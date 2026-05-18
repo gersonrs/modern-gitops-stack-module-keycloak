@@ -1,5 +1,25 @@
----
 {{- if .Values.keycloak.httproute.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: keycloak-http-redirect
+  labels:
+    {{- include "modern-gitops-stack-module-keycloak.labels" $ | indent 4 }}
+spec:
+  parentRefs:
+    - name: {{ .Values.keycloak.httproute.gateway_name | default "istio-gateway" }}
+      namespace: {{ .Values.keycloak.httproute.gateway_namespace | default "istio-ingress" }}
+      sectionName: http
+  hostnames:
+    - {{ .Values.keycloak.httproute.host | quote }}
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -10,6 +30,7 @@ spec:
   parentRefs:
     - name: {{ .Values.keycloak.httproute.gateway_name | default "istio-gateway" }}
       namespace: {{ .Values.keycloak.httproute.gateway_namespace | default "istio-ingress" }}
+      sectionName: https
   hostnames:
     - {{ .Values.keycloak.httproute.host | quote }}
   rules:
