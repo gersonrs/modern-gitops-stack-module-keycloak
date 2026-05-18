@@ -10,7 +10,7 @@ resource "keycloak_realm" "modern_gitops_stack" {
   login_theme                 = "modern-gitops"
   default_signature_algorithm = "RS256"
   access_code_lifespan        = "1h"
-  ssl_required                = "external"
+  ssl_required                = var.cluster_issuer == "letsencrypt-prod" ? "external" : "none"
   password_policy             = "upperCase(1) and length(8) and forceExpiredPasswordChange(365) and notUsername"
   attributes = {
     terraform = "true"
