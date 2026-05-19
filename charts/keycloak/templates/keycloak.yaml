@@ -18,10 +18,8 @@ spec:
       key: password
   http:
     httpEnabled: true
-    httpsPort: 8443
-    tlsSecret: keycloak-tls-secret
   hostname:
-    hostname: {{ .Values.keycloak.ingress.host | quote }}
+    hostname: {{ .Values.keycloak.httproute.host | quote }}
   ingress:
     enabled: false
   proxy:
@@ -32,3 +30,37 @@ spec:
     scrapeTimeout: 5s
   networkPolicy:
     enabled: false
+  {{- if .Values.keycloak.theme.enabled }}
+  additionalOptions:
+    - name: spi-theme-login-default
+      value: {{ .Values.keycloak.theme.name | default "modern-gitops" | quote }}
+  unsupported:
+    podTemplate:
+      spec:
+        initContainers:
+          - name: git-clone-theme
+            image: {{ .Values.keycloak.theme.initContainer.image | default "alpine/git" }}
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - >-
+                cd /tmp &&
+                git clone --branch={{ .Values.keycloak.theme.repository.branch | default "main" }} {{ .Values.keycloak.theme.repository.url }} keycloak-theme &&
+                cp -r keycloak-theme/{{ .Values.keycloak.theme.repository.path | default "themes" }}/* /theme
+            volumeMounts:
+              - name: theme-volume
+                mountPath: /theme
+        containers:
+          - name: keycloak
+            volumeMounts:
+              - name: theme-volume
+                mountPath: /opt/keycloak/themes/{{ .Values.keycloak.theme.name | default "modern-gitops" }}
+        volumes:
+          - name: theme-volume
+            emptyDir: {}
+  {{- end }}

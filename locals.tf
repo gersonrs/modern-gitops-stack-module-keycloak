@@ -16,19 +16,23 @@ locals {
       serviceMonitor = {
         enabled = var.enable_service_monitor
       }
-      ingress = {
-        enabled = true
-        annotations = {
-          "cert-manager.io/cluster-issuer"                   = "${var.cluster_issuer}"
-          "traefik.ingress.kubernetes.io/router.entrypoints" = "websecure"
-          "traefik.ingress.kubernetes.io/router.tls"         = "true"
+      theme = {
+        enabled = var.enable_custom_theme
+        name    = var.theme_config.name
+        initContainer = {
+          image = var.theme_config.init_container_image
         }
-        host = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
-        path = "/"
-        tls = {
-          secretName = "keycloak-tls-secret"
-          host       = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
+        repository = {
+          url    = var.theme_config.repository_url
+          branch = var.theme_config.repository_branch
+          path   = var.theme_config.repository_path
         }
+      }
+      httproute = {
+        enabled           = true
+        host              = "keycloak.${var.subdomain != "" ? "${trimprefix(var.subdomain, ".")}." : ""}${var.base_domain}"
+        gateway_name      = var.gateway_name
+        gateway_namespace = var.gateway_namespace
       }
     }
   }]

@@ -7,9 +7,10 @@ resource "keycloak_realm" "modern_gitops_stack" {
   display_name                = "Modern GitOps Stack"
   display_name_html           = "<img width='200px' src='https://raw.githubusercontent.com/GersonRS/credit-risk-analysis-with-machine-learning/main/.github/assets/images/logo.png' alt='Modern GitOps Stack Logo'/>"
   login_with_email_allowed    = true
+  login_theme                 = "modern-gitops"
   default_signature_algorithm = "RS256"
   access_code_lifespan        = "1h"
-  ssl_required                = "external"
+  ssl_required                = var.cluster_issuer == "letsencrypt-prod" ? "external" : "none"
   password_policy             = "upperCase(1) and length(8) and forceExpiredPasswordChange(365) and notUsername"
   attributes = {
     terraform = "true"
@@ -34,6 +35,14 @@ resource "keycloak_openid_client" "modern_gitops_stack" {
   standard_flow_enabled        = true
   direct_access_grants_enabled = true
   valid_redirect_uris          = var.oidc_redirect_uris
+}
+
+resource "keycloak_openid_audience_protocol_mapper" "modern_gitops_stack" {
+  realm_id  = resource.keycloak_realm.modern_gitops_stack.id
+  client_id = resource.keycloak_openid_client.modern_gitops_stack.id
+  name      = "audience"
+
+  included_client_audience = local.oidc.client_id
 }
 
 resource "keycloak_openid_client_scope" "modern_gitops_stack_groups" {
@@ -124,7 +133,7 @@ resource "keycloak_group" "modern_gitops_stack_editors" {
   name     = "modern-gitops-stack-editors"
   attributes = {
     "terraform" = "true"
-    "policy"    = "readwrite"
+    "policy"    = "consoleAdmin##readwrite"
   }
 }
 
@@ -133,7 +142,7 @@ resource "keycloak_group" "modern_gitops_stack_data_engineers" {
   name     = "modern-gitops-stack-data-engineers"
   attributes = {
     "terraform"   = "true"
-    "policy"      = "readwrite"
+    "policy"      = "consoleAdmin##readwrite"
     "description" = "Data Engineers - Access to data pipelines, ETL jobs, Airflow, NiFi, Kafka"
   }
 }

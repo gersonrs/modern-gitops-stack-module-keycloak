@@ -120,3 +120,33 @@ variable "database" {
   default   = null
   sensitive = true
 }
+
+variable "enable_custom_theme" {
+  description = "Enable the Modern GitOps custom login theme."
+  type        = bool
+  default     = true
+}
+
+variable "theme_config" {
+  description = "Configuration for the custom Keycloak theme loaded from a Git repository."
+  type = object({
+    name                 = optional(string, "modern-gitops")
+    init_container_image = optional(string, "alpine/git")
+    repository_url       = optional(string, "https://github.com/GersonRS/keycloak-templates.git")
+    repository_branch    = optional(string, "main")
+    repository_path      = optional(string, "themes/modern-gitops")
+  })
+  default = {}
+}
+
+variable "gateway_name" {
+  description = "Name of the Istio Gateway resource to attach HTTPRoutes to."
+  type        = string
+  default     = "istio-gateway"
+}
+
+variable "gateway_namespace" {
+  description = "Namespace where the Istio Gateway resource is deployed."
+  type        = string
+  default     = "istio-ingress"
+}
