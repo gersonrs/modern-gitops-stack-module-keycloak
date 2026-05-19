@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.8.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.7.0...v2.8.0) (2026-05-19)
+
+
+### 🚀 New Features
+
+* add custom theme support via initContainer git clone ([e35e811](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/e35e8115a1f280a45016bc76e756ccbabe5e948c))
+* add custom theme support via initContainer git clone ([9c93373](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/9c93373636aa9c8e18b759d99825b74449b1c62f))
+* add gateway_name and gateway_namespace variables ([4d02904](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/4d02904585c26bd259472d634d25518e28830ded))
+* config somethings ([45918c5](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/45918c5889c70ca4b18db2926f39214465f51497))
+* configure theme modern-gitops ([70e8a6a](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/70e8a6ab21c0cfaeb33dc68297e6863e2b3f447b))
+* migrate from Traefik Ingress to Istio HTTPRoute (Gateway API) ([2dbf0d9](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/2dbf0d9190a45a7beeb8dc902a7f516c0a10da4b))
+* redirect HTTP to HTTPS via separate HTTPRoutes with sectionName ([22ed427](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/22ed4276ad53465875ee19589b2875177627aaed))
+
+
+### 🔥 Bug Fixes
+
+* add audience protocol mapper to Keycloak client ([fffad0b](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/fffad0bf45c7aa90c3ba7795bb1ab401e2688d00))
+* ensure secret is created after namespace by operator ([21f3f76](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/21f3f76e6bf1f79b6d32b572aca9dd1ff9c68332))
+* escape %{http_code} in Terraform heredoc template ([a14f544](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/a14f54429c6c84ade96713b312ed3eab1e3dd30c))
+* quote curl in wait_for_keycloak for POSIX sh compatibility ([960a495](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/960a49510946e61a98ab8f7d1e268c16ab445432))
+* use http protocol in wait_for_keycloak since gateway only has http listener for kind ([397d588](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/397d58856427466c715aaef6706162fc56e23b17))
+* use http scheme for non-prod issuers in OIDC URLs and Keycloak ssl_required ([4f45380](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/4f453803fd696057e468c5dd8efd578b0defa4e4))
+* use https scheme for all cluster issuers except selfsigned-issuer ([eb037d6](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/eb037d626013edb53ed24ad70c01ca2f3ec3a014))
+* wait for keycloak using https endpoint in local-exec readiness check ([0402aef](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/0402aef77b841dc52410de07954ece3d1700d851))
+
+
+### ⌨️ Code Refactoring
+
+* simplify HTTPRoute to use sectionName https only ([74cc5cd](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/74cc5cd03455b672dfdff204bf2fc466390254c6))
+
 ## [2.7.0](https://github.com/GersonRS/modern-gitops-stack-module-keycloak/compare/v2.6.0...v2.7.0) (2026-01-26)
 
 
