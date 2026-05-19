@@ -206,7 +206,7 @@ Description: Override of target revision of the application chart.
 
 Type: `string`
 
-Default: `"v2.7.0"`
+Default: `"v2.8.0"`
 
 ==== [[input_cluster_issuer]] <<input_cluster_issuer,cluster_issuer>>
 
@@ -287,6 +287,48 @@ object({
 ----
 
 Default: `null`
+
+==== [[input_enable_custom_theme]] <<input_enable_custom_theme,enable_custom_theme>>
+
+Description: Enable the Modern GitOps custom login theme.
+
+Type: `bool`
+
+Default: `true`
+
+==== [[input_theme_config]] <<input_theme_config,theme_config>>
+
+Description: Configuration for the custom Keycloak theme loaded from a Git repository.
+
+Type:
+[source,hcl]
+----
+object({
+    name                 = optional(string, "modern-gitops")
+    init_container_image = optional(string, "alpine/git")
+    repository_url       = optional(string, "https://github.com/GersonRS/keycloak-templates.git")
+    repository_branch    = optional(string, "main")
+    repository_path      = optional(string, "themes/modern-gitops")
+  })
+----
+
+Default: `{}`
+
+==== [[input_gateway_name]] <<input_gateway_name,gateway_name>>
+
+Description: Name of the Istio Gateway resource to attach HTTPRoutes to.
+
+Type: `string`
+
+Default: `"istio-gateway"`
+
+==== [[input_gateway_namespace]] <<input_gateway_namespace,gateway_namespace>>
+
+Description: Namespace where the Istio Gateway resource is deployed.
+
+Type: `string`
+
+Default: `"istio-ingress"`
 
 === Outputs
 
@@ -410,7 +452,7 @@ Description: Credentials for the administrator user of the master realm created 
 |[[input_target_revision]] <<input_target_revision,target_revision>>
 |Override of target revision of the application chart.
 |`string`
-|`"v2.7.0"`
+|`"v2.8.0"`
 |no
 
 |[[input_cluster_issuer]] <<input_cluster_issuer,cluster_issuer>>
@@ -483,6 +525,42 @@ object({
 ----
 
 |`null`
+|no
+
+|[[input_enable_custom_theme]] <<input_enable_custom_theme,enable_custom_theme>>
+|Enable the Modern GitOps custom login theme.
+|`bool`
+|`true`
+|no
+
+|[[input_theme_config]] <<input_theme_config,theme_config>>
+|Configuration for the custom Keycloak theme loaded from a Git repository.
+|
+
+[source]
+----
+object({
+    name                 = optional(string, "modern-gitops")
+    init_container_image = optional(string, "alpine/git")
+    repository_url       = optional(string, "https://github.com/GersonRS/keycloak-templates.git")
+    repository_branch    = optional(string, "main")
+    repository_path      = optional(string, "themes/modern-gitops")
+  })
+----
+
+|`{}`
+|no
+
+|[[input_gateway_name]] <<input_gateway_name,gateway_name>>
+|Name of the Istio Gateway resource to attach HTTPRoutes to.
+|`string`
+|`"istio-gateway"`
+|no
+
+|[[input_gateway_namespace]] <<input_gateway_namespace,gateway_namespace>>
+|Namespace where the Istio Gateway resource is deployed.
+|`string`
+|`"istio-ingress"`
 |no
 
 |===
