@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.9.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.8.0...v2.9.0) (2026-07-11)
+
+
+### 🚀 New Features
+
+* add namespace_labels variable to all modules ([9e38497](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/9e384974065dfeae49896380e83804e431304b1c))
+* add namespace_labels variable to all modules ([08b89f9](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/08b89f93c1e13187319aac01eb60bf3a2afe66d7))
+
 ## [2.8.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.7.0...v2.8.0) (2026-05-19)
 
 
