@@ -70,12 +70,51 @@ resource "keycloak_custom_identity_provider_mapper" "corporate_sso_default_group
   realm                    = resource.keycloak_realm.modern_gitops_stack.id
   name                     = "default-group-assignment"
   identity_provider_alias  = resource.keycloak_oidc_identity_provider.corporate_sso[0].alias
-  identity_provider_mapper = "%s-hardcoded-group-idp-mapper"
+  identity_provider_mapper = "oidc-hardcoded-group-idp-mapper"
 
   extra_config = {
     syncMode = "INHERIT"
     group    = "/${resource.keycloak_group.modern_gitops_stack_viewers.name}"
   }
+}
+
+# The "Review Profile" step of the built-in "first broker login" flow renders
+# idp-review-user-profile.ftl, which relies on a section-based nesting
+# protocol (<#nested "header">/<#nested "form">) that the custom
+# "modern-gitops" login theme does not implement, causing a 500 error on
+# first login via any broker. Since trust_email + the hardcoded group mapper
+# already provide everything needed to provision the shadow user, this step
+# is disabled so users skip straight to account linking/creation.
+data "keycloak_authentication_execution" "review_profile" {
+  count = var.corporate_identity_provider.enabled ? 1 : 0
+
+  realm_id          = resource.keycloak_realm.modern_gitops_stack.id
+  parent_flow_alias = "first broker login"
+  provider_id       = "idp-review-profile"
+}
+
+resource "keycloak_authentication_execution_config" "review_profile_disabled" {
+  count = var.corporate_identity_provider.enabled ? 1 : 0
+
+  realm_id     = resource.keycloak_realm.modern_gitops_stack.id
+  execution_id = data.keycloak_authentication_execution.review_profile[0].id
+  alias        = "review-profile-disabled"
+
+  config = {
+    "update.profile.on.first.login" = "off"
+  }
+}
+
+# The "Verify Profile" required action also renders a section-based template
+# (login-update-profile.ftl) that hits the same theme limitation, and gets
+# attached automatically to newly created users (including shadow users
+# created via the corporate SSO broker). Disabling it realm-wide avoids the
+# same 500 error for both broker and local logins.
+resource "keycloak_required_action" "verify_profile_disabled" {
+  realm_id       = resource.keycloak_realm.modern_gitops_stack.id
+  alias          = "VERIFY_PROFILE"
+  enabled        = false
+  default_action = false
 }
 
 resource "keycloak_openid_client" "modern_gitops_stack" {
