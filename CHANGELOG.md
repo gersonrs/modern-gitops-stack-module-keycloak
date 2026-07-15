@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.10.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.9.0...v2.10.0) (2026-07-15)
+
+
+### 🚀 New Features
+
+* add identity brokering support for corporate OIDC provider ([a3c5de0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/a3c5de036a22c1b82abaa1726ce63e61ebdab1a7))
+* add identity brokering support for corporate OIDC provider ([fcd6cd0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/fcd6cd06da36c1efdd481de760edb3ecbca7604d))
+* add identity integration ([fc760b5](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/fc760b53de3724f3097e22db9992de3fa7204d00))
+* delete oidc_bootstrap/.terraform.lock.hcl ([a8ead63](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/a8ead63f11124003e5db7d14d3020944825acadf))
+
 ## [2.9.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.8.0...v2.9.0) (2026-07-11)
 
 
