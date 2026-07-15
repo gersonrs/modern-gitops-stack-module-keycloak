@@ -26,6 +26,97 @@ resource "random_password" "client_secret" {
   special = false
 }
 
+# Identity Brokering: lets users authenticate via an external corporate SSO
+# (e.g. Magalu's Keycloak) while this Keycloak remains the source of truth for
+# authorization (groups/roles) used by the applications in this stack. On
+# first login, Keycloak creates a local "shadow" user from the external IdP's
+# claims; groups/roles are then assigned locally (manually or via mappers).
+resource "keycloak_oidc_identity_provider" "corporate_sso" {
+  count = var.corporate_identity_provider.enabled ? 1 : 0
+
+  realm             = resource.keycloak_realm.modern_gitops_stack.id
+  alias             = var.corporate_identity_provider.alias
+  display_name      = var.corporate_identity_provider.display_name
+  authorization_url = var.corporate_identity_provider.authorization_url
+  token_url         = var.corporate_identity_provider.token_url
+  user_info_url     = var.corporate_identity_provider.user_info_url
+  jwks_url          = var.corporate_identity_provider.jwks_url
+  logout_url        = var.corporate_identity_provider.logout_url
+  issuer            = var.corporate_identity_provider.issuer
+  client_id         = var.corporate_identity_provider.client_id
+  client_secret     = var.corporate_identity_provider.client_secret
+  default_scopes    = var.corporate_identity_provider.default_scopes
+  sync_mode         = var.corporate_identity_provider.sync_mode
+  trust_email       = var.corporate_identity_provider.trust_email
+  store_token       = true
+
+  extra_config = {
+    "clientAuthMethod" = "client_secret_post"
+  }
+
+  depends_on = [
+    resource.keycloak_realm.modern_gitops_stack
+  ]
+}
+
+# Automatically assigns every user authenticating via the corporate SSO to the
+# least-privileged local group on first login (since anyone who successfully
+# authenticates through this specific broker is, by definition, a Magalu
+# employee). From there, admins can promote users to more privileged groups
+# (editors/admins/etc.) manually as needed.
+resource "keycloak_custom_identity_provider_mapper" "corporate_sso_default_group" {
+  count = var.corporate_identity_provider.enabled ? 1 : 0
+
+  realm                    = resource.keycloak_realm.modern_gitops_stack.id
+  name                     = "default-group-assignment"
+  identity_provider_alias  = resource.keycloak_oidc_identity_provider.corporate_sso[0].alias
+  identity_provider_mapper = "oidc-hardcoded-group-idp-mapper"
+
+  extra_config = {
+    syncMode = "INHERIT"
+    group    = "/${resource.keycloak_group.modern_gitops_stack_viewers.name}"
+  }
+}
+
+# The "Review Profile" step of the built-in "first broker login" flow renders
+# idp-review-user-profile.ftl, which relies on a section-based nesting
+# protocol (<#nested "header">/<#nested "form">) that the custom
+# "modern-gitops" login theme does not implement, causing a 500 error on
+# first login via any broker. Since trust_email + the hardcoded group mapper
+# already provide everything needed to provision the shadow user, this step
+# is disabled so users skip straight to account linking/creation.
+data "keycloak_authentication_execution" "review_profile" {
+  count = var.corporate_identity_provider.enabled ? 1 : 0
+
+  realm_id          = resource.keycloak_realm.modern_gitops_stack.id
+  parent_flow_alias = "first broker login"
+  provider_id       = "idp-review-profile"
+}
+
+resource "keycloak_authentication_execution_config" "review_profile_disabled" {
+  count = var.corporate_identity_provider.enabled ? 1 : 0
+
+  realm_id     = resource.keycloak_realm.modern_gitops_stack.id
+  execution_id = data.keycloak_authentication_execution.review_profile[0].id
+  alias        = "review-profile-disabled"
+
+  config = {
+    "update.profile.on.first.login" = "off"
+  }
+}
+
+# The "Verify Profile" required action also renders a section-based template
+# (login-update-profile.ftl) that hits the same theme limitation, and gets
+# attached automatically to newly created users (including shadow users
+# created via the corporate SSO broker). Disabling it realm-wide avoids the
+# same 500 error for both broker and local logins.
+resource "keycloak_required_action" "verify_profile_disabled" {
+  realm_id       = resource.keycloak_realm.modern_gitops_stack.id
+  alias          = "VERIFY_PROFILE"
+  enabled        = false
+  default_action = false
+}
+
 resource "keycloak_openid_client" "modern_gitops_stack" {
   realm_id                     = resource.keycloak_realm.modern_gitops_stack.id
   name                         = "Modern GitOps Stack Applications"
