@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.10.0...v3.0.0) (2026-11-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* provider major bumps and a stricter Terraform baseline; consumers must run `terraform init -upgrade`.
+
+### 🚀 New Features
+
+* upgrade charts, providers and Terraform baseline ([#23](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/issues/23)) ([e0e273a](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/e0e273a2df921a2b16b5a9106b3b2d0e0b8b558d))
+
 ## [2.10.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.9.0...v2.10.0) (2026-07-15)
 
 
