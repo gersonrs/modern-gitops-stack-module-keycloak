@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v3.0.0...v3.1.0) (2026-11-22)
+
+
+### 🚀 New Features
+
+* make realm session lifetimes configurable ([#25](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/issues/25)) ([38ce662](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/38ce6624c7d5cc028ccd61926c88e062b11ccf80))
+
 ## [3.0.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v2.10.0...v3.0.0) (2026-11-20)
 
 
