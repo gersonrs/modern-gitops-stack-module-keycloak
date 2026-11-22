@@ -9,7 +9,13 @@ resource "keycloak_realm" "modern_gitops_stack" {
   login_with_email_allowed    = true
   login_theme                 = "modern-gitops"
   default_signature_algorithm = "RS256"
+  # access_code_lifespan only bounds the authorization code, not the session.
+  # The setting that logs an idle user out is sso_session_idle_timeout, which
+  # Keycloak defaults to 30 minutes; see the session_settings variable.
   access_code_lifespan        = "1h"
+  sso_session_idle_timeout    = var.session_settings.sso_session_idle_timeout
+  sso_session_max_lifespan    = var.session_settings.sso_session_max_lifespan
+  access_token_lifespan       = var.session_settings.access_token_lifespan
   ssl_required                = var.cluster_issuer == "letsencrypt-prod" ? "external" : "none"
   password_policy             = "upperCase(1) and length(8) and forceExpiredPasswordChange(365) and notUsername"
   attributes = {
