@@ -94,3 +94,27 @@ variable "corporate_identity_provider" {
   default   = {}
   sensitive = true
 }
+
+variable "session_settings" {
+  description = <<-EOT
+    Realm session and token lifetimes. Defaults keep users signed in for a
+    working day instead of the Keycloak defaults, which expire an idle session
+    after 30 minutes and force a new login.
+
+    - `sso_session_idle_timeout`: how long a session may stay idle before it is
+      invalidated. This is what logs the user out after a coffee break.
+    - `sso_session_max_lifespan`: absolute session lifetime regardless of
+      activity.
+    - `access_token_lifespan`: how long an access token stays valid before the
+      client must refresh it. Kept at the Keycloak default so the shorter
+      session does not widen the token exposure window.
+
+    Values use Keycloak duration syntax, e.g. "30m", "12h", "1d".
+  EOT
+  type = object({
+    sso_session_idle_timeout = optional(string, "12h")
+    sso_session_max_lifespan = optional(string, "24h")
+    access_token_lifespan    = optional(string, "5m")
+  })
+  default = {}
+}
