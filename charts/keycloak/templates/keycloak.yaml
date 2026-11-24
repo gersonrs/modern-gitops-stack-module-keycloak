@@ -30,10 +30,19 @@ spec:
     scrapeTimeout: 5s
   networkPolicy:
     enabled: false
-  {{- if .Values.keycloak.theme.enabled }}
+  {{- if or .Values.keycloak.theme.enabled .Values.keycloak.serviceMonitor.enabled }}
   additionalOptions:
+    {{- if .Values.keycloak.serviceMonitor.enabled }}
+    # The operator only creates the ServiceMonitor when metrics are enabled.
+    - name: metrics-enabled
+      value: "true"
+    {{- end }}
+    {{- if .Values.keycloak.theme.enabled }}
     - name: spi-theme-login-default
       value: {{ .Values.keycloak.theme.name | default "modern-gitops" | quote }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.keycloak.theme.enabled }}
   unsupported:
     podTemplate:
       spec:
