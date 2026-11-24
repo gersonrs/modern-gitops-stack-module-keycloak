@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.2](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v4.0.1...v4.0.2) (2026-11-24)
+
+
+### 📚 Documentation
+
+* add usage and dependencies to the module documentation ([#31](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/issues/31)) ([51101c8](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/51101c8aa8b9e6312f2230abd61795ab1cdd29a6))
+
 ## [4.0.1](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v4.0.0...v4.0.1) (2026-11-24)
 
 
