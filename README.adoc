@@ -1,84 +1,54 @@
 = modern-gitops-stack-module-keycloak
-// Document attributes to replace along the document
-:keycloak-version: 26.8.2
 
-A https://modern-gitops-stack.io[Modern GitOps Stack] module to deploy and configure https://www.keycloak.org/[Keycloak] as an OIDC provider. It is meant to be used mainly for testing purposes when deploying a local cluster using https://github.com/GersonRS/modern-gitops-stack-module-cluster-kind[KinD].
+A https://modern-gitops-stack.io[Modern GitOps Stack] module to deploy Keycloak, the identity provider that backs SSO for every application in the stack.
 
-This repository contains 2 charts:
-
-  - `keycloak-operator`: contains the CRDs and the other Kubernetes resources in order to install the operator as recommended for a vanilla Kubernetes installation in Keycloak's https://www.keycloak.org/operator/installation[documentation];
-  - `keycloak`: installs Keycloak and associated resources (such as an ingress) as well as PostgreSQL deployment (optional if you provide the credentials for an external database).
-
-The Keycloak version installed is the *26.8.2*. https://www.keycloak.org/guides[Here] you will find the official guides of Keycloak, namely https://www.keycloak.org/guides#operator[the ones used for this module] in the _Operator_ section.
-
-Besides this module, we developed a xref:./oidc_bootstrap/README.adoc[submodule] to bootstrap a realm, groups and users so you can be up an running as fast as possible.
+The `keycloak`, `keycloak-operator` chart is authored inside this repository rather than depending on an upstream chart, so the manifests track the custom resources this module needs.
 
 == Usage
 
-This module can be declared by adding the following block on your Terraform configuration (below is an example when using KinD, but nothing stops you of using this module with the other cluster modules of the Modern GitOps Stack):
+This module can be declared by adding the following block to your Terraform configuration:
 
 [source,terraform]
 ----
 module "keycloak" {
   source = "git::https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git?ref=<RELEASE>"
 
-  cluster_name     = local.cluster_name
-  base_domain      = format("%s.nip.io", replace(module.ingress.external_ip, ".", "-"))
-  cluster_issuer   = local.cluster_issuer
-  argocd_namespace = module.argocd_bootstrap.argocd_namespace
+  cluster_name   = local.cluster_name
+  base_domain    = local.base_domain
+  subdomain      = local.subdomain
+  cluster_issuer = local.cluster_issuer
+  app_autosync   = local.app_autosync
 
   dependency_ids = {
-    traefik      = module.ingress.id
-    cert-manager = module.cert-manager.id
+    istio          = module.istio.id
+    cert-manager   = module.cert-manager.id
+    postgresql     = module.postgresql.id
+    crds_bootstrap = module.crds_bootstrap.id
   }
 }
 ----
 
-=== Database Configuration
-
-IMPORTANT: We do not recommend using the PostgreSQL deployment in a production environment. It should be used only for development purposes and the persistence of the database is not guaranteed.
-
-In a production environment, it is recommended to use an external SQL database and to give this module only the connection details. In that case, the default PostgreSQL _sidecar_ will not be deployed.
-
-You can provide the credentials for connecting Keycloak to an external SQL database as follows:
-
-[source,terraform]
-----
-module "keycloak" {
-  source = "git::https://github.com/GersonRS/modern-gitops-stack-module-keycloak.git?ref=<RELEASE>"
-
-  cluster_name     = local.cluster_name
-  base_domain      = format("%s.nip.io", replace(module.ingress.external_ip, ".", "-"))
-  cluster_issuer   = local.cluster_issuer
-  argocd_namespace = module.argocd_bootstrap.argocd_namespace
-
-  database = {
-    vendor   = "mariadb | mssql | mysql | oracle | postgres"
-    host     = "<HOSTNAME>"
-    username = "<USERNAME>"
-    password = "<PASSWORD>"
-  }
-
-  dependency_ids = {
-    traefik      = module.ingress.id
-    cert-manager = module.cert-manager.id
-  }
-}
-----
-
-The https://www.keycloak.org/server/db[official documentation] provides more information about the supported database vendors.
+The application is deployed to the `management` namespace.
 
 == Technical Reference
 
 === Dependencies
 
-==== `module.argocd_bootstrap`
+==== `module.istio.id`
 
-This module needs a working Argo CD, so at least it depends on `module.argocd_bootstrap`.
+Keycloak is exposed through the Istio gateway.
 
-==== `module.ingress.id`
+==== `module.cert-manager.id`
 
-Since there is an ingress deployed with this module, it needs to be deployed after Traefik so it depends on `module.ingress`.
+The Keycloak certificate is issued by cert-manager.
+
+==== `module.postgresql.id`
+
+Keycloak stores its realm and users in PostgreSQL.
+
+==== `module.crds_bootstrap.id`
+
+Keycloak ships a ServiceMonitor, which needs the Prometheus Operator CRDs.
 
 // BEGIN_TF_DOCS
 === Requirements
