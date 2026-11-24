@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.1](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v4.0.0...v4.0.1) (2026-11-24)
+
+
+### 🔥 Bug Fixes
+
+* enable metrics when the ServiceMonitor is enabled ([#29](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/issues/29)) ([7552e22](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/7552e22edb056a7cd882c447f5c12e72af134c00))
+
 ## [4.0.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v3.1.0...v4.0.0) (2026-11-24)
 
 
