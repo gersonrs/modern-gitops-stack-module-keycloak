@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v3.1.0...v4.0.0) (2026-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* enable the ServiceMonitor by default ([#27](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/issues/27))
+
+### 🚀 New Features
+
+* enable the ServiceMonitor by default ([#27](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/issues/27)) ([34adfd4](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/commit/34adfd404114e633208cec244b20f986bc39b396))
+
 ## [3.1.0](https://github.com/gersonrs/modern-gitops-stack-module-keycloak/compare/v3.0.0...v3.1.0) (2026-11-22)
 
 
